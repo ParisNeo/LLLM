@@ -18,6 +18,7 @@ from ascii_colors import ASCIIColors
 from lollms.databases.discussions_database import DiscussionsDB
 from pathlib import Path
 from safe_store.text_vectorizer import TextVectorizer, VectorizationMethod, VisualizationMethod
+from lollms.security import sanitize_path_from_endpoint
 import tqdm
 from fastapi import FastAPI, UploadFile, File
 import shutil
@@ -35,6 +36,8 @@ lollmsElfServer = LOLLMSWebUI.get_instance()
 
 @router.get("/switch_personal_path")
 def switch_personal_path(data:PersonalPathParameters):
+    
+    sanitize_path_from_endpoint(data.path)
     path = data.path
     global_paths_cfg = Path("./global_paths_cfg.yaml")
     if global_paths_cfg.exists():
