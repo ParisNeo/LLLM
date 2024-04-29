@@ -123,7 +123,7 @@ def sanitize_path(path: str, allow_absolute_path: bool = False, error_text="Abso
     -----
     This function checks for patterns like "....", multiple forward slashes, and command injection attempts like $(whoami). It also checks for unauthorized punctuation characters, excluding the dot (.) character.
     """    
-    if not allow_absolute_path and path.strip().startswith("/"):
+    if not allow_absolute_path and (path.strip().startswith("/") or path.strip().startswith("\\")):
         raise HTTPException(status_code=400, detail=exception_text)
 
     if path is None:
@@ -142,7 +142,7 @@ def sanitize_path(path: str, allow_absolute_path: bool = False, error_text="Abso
         raise HTTPException(status_code=400, detail=exception_text)
 
     if not allow_absolute_path:
-        path = path.lstrip('/')
+        path = path.lstrip('/').lstrip('\\')
 
     return path
 
@@ -173,7 +173,7 @@ def sanitize_path_from_endpoint(path: str, error_text: str = "A suspected LFI at
     if path is None:
         return path
 
-    if path.strip().startswith("/"):
+    if path.strip().startswith("/") or path.strip().startswith("\\"):
         raise HTTPException(status_code=400, detail=exception_text)
 
     # Regular expression to detect patterns like "...." and multiple forward slashes
@@ -188,7 +188,7 @@ def sanitize_path_from_endpoint(path: str, error_text: str = "A suspected LFI at
         ASCIIColors.error(error_text)
         raise HTTPException(status_code=400, detail=exception_text)
 
-    path = path.lstrip('/')
+    path = path.lstrip('/').lstrip('\\')
     return path
 
 
